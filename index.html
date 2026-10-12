@@ -552,7 +552,7 @@
       margin: 0 !important;
     }
 
-    .no-print, .top-navbar, .labeler-machine, .sheet-header-bar {
+    .no-print, .top-navbar, .labeler-machine, .sheet-header-bar, .mobile-tabs, .mobile-floating-bar {
       display: none !important;
     }
 
@@ -560,18 +560,25 @@
       display: block !important;
       max-width: none !important;
       margin: 0 !important;
+      width: 100% !important;
     }
 
-    .sheet-wrapper {
+    .sheet-wrapper, .sheet-wrapper.tab-view-hidden {
+      display: block !important;
       border: none !important;
       box-shadow: none !important;
       padding: 0 !important;
+      margin: 0 !important;
+      width: 100% !important;
+      max-width: 100% !important;
     }
 
     .printable-paper {
+      display: grid !important;
       border: none !important;
       padding: 5mm !important;
       gap: 5mm !important;
+      box-shadow: none !important;
     }
 
     .label-strip-item, .label-flag-item, .label-wrap-item {
@@ -601,6 +608,8 @@
     <span class="badge-web">Listo para alojar en Red Local / Intranet</span>
     <button class="btn-outline" onclick="window.print()">🖨️ Imprimir (Ctrl+P)</button>
   </div>
+</div>
+
 <!-- SELECTOR DE PESTAÑAS PARA MÓVIL -->
 <div class="mobile-tabs no-print">
   <button class="mobile-tab-btn active" id="tab-machine-btn" onclick="switchMobileTab('machine')">
