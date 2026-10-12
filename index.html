@@ -2,7 +2,12 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<meta name="theme-color" content="#2563eb">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Rotuladora">
 <title>Rotuladora Web Pro // Generador Universal de Etiquetas</title>
 <style>
   :root {
@@ -442,6 +447,98 @@
     line-height: 1.4;
   }
 
+  /* ========================================================
+     ESTILOS MÓVIL Y RESPONSIVO (PANTALLAS PEQUEÑAS)
+     ======================================================== */
+  .mobile-tabs {
+    display: none;
+    max-width: 1400px;
+    margin: 0 auto 16px auto;
+    background: #e2e8f0;
+    border-radius: 10px;
+    padding: 4px;
+    gap: 6px;
+  }
+
+  .mobile-tab-btn {
+    flex: 1;
+    padding: 11px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    background: transparent;
+    color: #475569;
+    cursor: pointer;
+  }
+
+  .mobile-tab-btn.active {
+    background: #ffffff;
+    color: var(--primary);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+
+  .mobile-floating-bar {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border-top: 1px solid var(--border-color);
+    padding: 10px 16px;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+    z-index: 100;
+    align-items: center;
+    gap: 10px;
+  }
+
+  @media (max-width: 960px) {
+    body {
+      padding: 12px 10px 80px 10px; /* Margen inferior para barra flotante */
+    }
+
+    .top-navbar {
+      flex-direction: column;
+      gap: 10px;
+      align-items: flex-start;
+      padding: 12px;
+    }
+
+    .mobile-tabs {
+      display: flex;
+    }
+
+    .mobile-floating-bar {
+      display: flex;
+    }
+
+    .main-layout {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    /* Ocultar / Mostrar según tab en móvil */
+    .tab-view-hidden {
+      display: none !important;
+    }
+
+    /* Evitar auto-zoom en iPhone */
+    .field-input, .field-select, .field-textarea {
+      font-size: 16px !important;
+    }
+
+    .sheet-wrapper {
+      padding: 12px;
+      overflow-x: auto;
+    }
+
+    .printable-paper {
+      padding: 10px;
+      min-height: auto;
+    }
+  }
+
   /* REGLAS PARA IMPRESIÓN (CTRL + P) */
   @media print {
     * {
@@ -504,6 +601,14 @@
     <span class="badge-web">Listo para alojar en Red Local / Intranet</span>
     <button class="btn-outline" onclick="window.print()">🖨️ Imprimir (Ctrl+P)</button>
   </div>
+<!-- SELECTOR DE PESTAÑAS PARA MÓVIL -->
+<div class="mobile-tabs no-print">
+  <button class="mobile-tab-btn active" id="tab-machine-btn" onclick="switchMobileTab('machine')">
+    🏷️ Diseñar Etiqueta
+  </button>
+  <button class="mobile-tab-btn" id="tab-sheet-btn" onclick="switchMobileTab('sheet')">
+    📄 Ver Hoja de Impresión
+  </button>
 </div>
 
 <div class="main-layout">
@@ -830,10 +935,63 @@ EQUIPO-03</textarea>
     updateApp();
   }
 
+  let currentMobileTab = 'machine';
+  function switchMobileTab(tab) {
+    currentMobileTab = tab;
+    const isMobile = window.innerWidth <= 960;
+    if (!isMobile) return;
+
+    const machineEl = document.querySelector('.labeler-machine');
+    const sheetEl = document.querySelector('.sheet-wrapper');
+    const tabMachBtn = document.getElementById('tab-machine-btn');
+    const tabSheetBtn = document.getElementById('tab-sheet-btn');
+    const toggleBtn = document.getElementById('mobile-toggle-btn');
+
+    if (tab === 'machine') {
+      machineEl.classList.remove('tab-view-hidden');
+      sheetEl.classList.add('tab-view-hidden');
+      if (tabMachBtn) tabMachBtn.classList.add('active');
+      if (tabSheetBtn) tabSheetBtn.classList.remove('active');
+      if (toggleBtn) toggleBtn.innerText = '📄 Ver Hoja';
+    } else {
+      machineEl.classList.add('tab-view-hidden');
+      sheetEl.classList.remove('tab-view-hidden');
+      if (tabMachBtn) tabMachBtn.classList.remove('active');
+      if (tabSheetBtn) tabSheetBtn.classList.add('active');
+      if (toggleBtn) toggleBtn.innerText = '🏷️ Diseñar';
+    }
+  }
+
+  function toggleMobileView() {
+    switchMobileTab(currentMobileTab === 'machine' ? 'sheet' : 'machine');
+  }
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 960) {
+      document.querySelector('.labeler-machine').classList.remove('tab-view-hidden');
+      document.querySelector('.sheet-wrapper').classList.remove('tab-view-hidden');
+    } else {
+      switchMobileTab(currentMobileTab);
+    }
+  });
+
   window.onload = () => {
     updateApp();
+    if (window.innerWidth <= 960) {
+      switchMobileTab('machine');
+    }
   };
 </script>
+
+<!-- BARRA FLOTANTE FIJA PARA MÓVIL -->
+<div class="mobile-floating-bar no-print">
+  <button class="btn-print-main" style="margin-top:0; flex: 2;" onclick="window.print()">
+    🖨️ IMPRIMIR / PDF
+  </button>
+  <button class="btn-outline" style="flex: 1; padding: 12px 6px;" id="mobile-toggle-btn" onclick="toggleMobileView()">
+    📄 Ver Hoja
+  </button>
+</div>
 
 </body>
 </html>
