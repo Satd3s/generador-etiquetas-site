@@ -369,7 +369,7 @@
 
   /* TIRAS INDIVIDUALES EN HOJA */
   .label-strip-item {
-    border: 1px dashed #94a3b8;
+    border: var(--border-cut-style, 1.2px solid #334155);
     background: var(--tape-bg);
     color: var(--tape-text);
     height: var(--tape-height);
@@ -383,7 +383,7 @@
 
   .label-strip-text {
     font-family: 'Consolas', 'Courier New', monospace;
-    font-weight: bold;
+    font-weight: 900;
     text-align: center;
     letter-spacing: 0.5px;
     white-space: nowrap;
@@ -393,7 +393,7 @@
 
   /* BANDERA DE CABLE */
   .label-flag-item {
-    border: 1px dashed #94a3b8;
+    border: var(--border-cut-style, 1.2px solid #334155);
     background: var(--tape-bg);
     color: var(--tape-text);
     height: 65px;
@@ -408,25 +408,26 @@
     width: 46%;
     font-family: 'Consolas', monospace;
     font-size: 10px;
-    font-weight: bold;
+    font-weight: 900;
     line-height: 1.35;
   }
 
   .flag-mid {
     width: 8%;
     text-align: center;
-    color: #cbd5e1;
-    border-left: 1px dotted #94a3b8;
+    color: #1e293b;
+    border-left: 2px solid #0f172a;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 11px;
+    font-weight: 900;
   }
 
   /* ENVOLTURA DE CABLE */
   .label-wrap-item {
-    border: 1px dashed #94a3b8;
+    border: var(--border-cut-style, 1.2px solid #334155);
     background: var(--tape-bg);
     color: var(--tape-text);
     height: 80px;
@@ -437,12 +438,17 @@
     page-break-inside: avoid;
     font-family: 'Consolas', monospace;
     font-size: 10px;
-    font-weight: bold;
+    font-weight: 900;
     line-height: 1.4;
   }
 
   /* REGLAS PARA IMPRESIÓN (CTRL + P) */
   @media print {
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+    }
+
     body {
       background: #ffffff !important;
       padding: 0 !important;
@@ -472,8 +478,13 @@
     }
 
     .label-strip-item, .label-flag-item, .label-wrap-item {
-      border: 1px dashed #555 !important;
+      border: var(--border-cut-style, 1.2px solid #000000) !important;
       box-shadow: none !important;
+    }
+
+    .flag-mid {
+      border-left: 2px solid #000000 !important;
+      color: #000000 !important;
     }
   }
 </style>
@@ -624,6 +635,17 @@ EQUIPO-03</textarea>
         <input type="text" class="field-input" id="origin-input" value="SWITCH-01 PTO01" oninput="updateApp()" placeholder="EJ: SWITCH-01 PTO01">
       </div>
 
+      <!-- GUÍA DE CORTE / BORDES -->
+      <div class="form-group">
+        <div class="field-label">✂️ Guía de Corte para Tijera / Cúter</div>
+        <select class="field-select" id="border-select" onchange="updateApp()">
+          <option value="solid-black" selected>Línea Continua Negra (Muy visible y fácil de cortar)</option>
+          <option value="solid-gray">Línea Continua Gris Fina</option>
+          <option value="dashed-black">Línea Punteada Fuerte y Oscura</option>
+          <option value="none">Sin líneas (Papel precortado)</option>
+        </select>
+      </div>
+
       <!-- BOTÓN PRINCIPAL -->
       <button class="btn-print-main" onclick="window.print()">
         🖨️ IMPRIMIR HOJA DE ETIQUETAS
@@ -690,11 +712,19 @@ EQUIPO-03</textarea>
     const tapeSpec = TAPE_SPECS[widthKey] || TAPE_SPECS['12mm'];
     const colorSpec = COLOR_SPECS[colorKey] || COLOR_SPECS['white-black'];
 
+    const borderMode = document.getElementById('border-select') ? document.getElementById('border-select').value : 'solid-black';
+    let borderStyle = '1.5px solid #000000';
+    if (borderMode === 'solid-black') borderStyle = '1.5px solid #000000';
+    else if (borderMode === 'solid-gray') borderStyle = '1px solid #64748b';
+    else if (borderMode === 'dashed-black') borderStyle = '1.5px dashed #000000';
+    else if (borderMode === 'none') borderStyle = 'none';
+
     // Variables de estilo
     document.documentElement.style.setProperty('--tape-bg', colorSpec.bg);
     document.documentElement.style.setProperty('--tape-text', colorSpec.text);
     document.documentElement.style.setProperty('--tape-border', colorSpec.border);
     document.documentElement.style.setProperty('--tape-height', tapeSpec.heightPx);
+    document.documentElement.style.setProperty('--border-cut-style', borderStyle);
 
     // Visibilidad del campo de origen
     document.getElementById('origin-box').style.display = (mode === 'flag' || mode === 'wrap') ? 'block' : 'none';
